@@ -60,7 +60,7 @@
 			autocomplete="current-password"
 		/>
 		<div id="recaptcha_button" />
-		<AppButton type="submit" btnSize="lg">Login</AppButton>
+		<AppButton type="submit" btnSize="md">Login</AppButton>
 	</form>
 </div>
 <!-- On load callback -->

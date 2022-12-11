@@ -90,6 +90,7 @@ const createAuth = () => {
 
 export const auth = createAuth();
 
+// Connect to localStorage
 auth.user.subscribe((user) => {
 	if (user) {
 		localStorage.setItem('user', JSON.stringify(user));

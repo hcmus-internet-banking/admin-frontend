@@ -40,6 +40,7 @@
 	} ${presets[preset || 'filled'].classNames} ${className} ${sizeClass[size]}`}
 	class:cursor-not-allowed,opacity-50={disabled}
 	disabled={disabled || isLoading}
+	on:click
 	{...$$restProps}
 >
 	{#if isLoading}

@@ -19,7 +19,6 @@ specifiers:
   svelte: ^3.54.0
   svelte-check: ^2.9.2
   svelte-loading-spinners: ^0.3.4
-  svelte-multicssclass: ^2.1.0
   svelte-preprocess: ^4.10.7
   tailwindcss: ^3.1.5
   tslib: ^2.4.1
@@ -46,7 +45,6 @@ devDependencies:
   svelte: 3.54.0
   svelte-check: 2.10.2_v4f7ozfe3bsi7lgm4qy7utpt3q
   svelte-loading-spinners: 0.3.4
-  svelte-multicssclass: 2.1.0
   svelte-preprocess: 4.10.7_gdssov3dhwivnidpnalytfzzhe
   tailwindcss: 3.2.4_postcss@8.4.19
   tslib: 2.4.1
@@ -1956,10 +1954,6 @@ packages:
 
   /svelte-loading-spinners/0.3.4:
     resolution: {integrity: sha512-vKaW71QMCBcTNijAGc0mUl8k3DQ66iYmp6MB8BMGCXyWk82bTrcLy8FOnSm9fE+8q6TwzD6PLUoYFHt0II93Xw==}
-    dev: true
-
-  /svelte-multicssclass/2.1.0:
-    resolution: {integrity: sha512-aquFYyjhBA+6up14p0IMVBsXCeZaKeU2m/h0S4ePJi0eQMOAjah8rM5CKNiD5+Tvb/cjTV5hd9z0+y+FVA1cNg==}
     dev: true
 
   /svelte-preprocess/4.10.7_gdssov3dhwivnidpnalytfzzhe:

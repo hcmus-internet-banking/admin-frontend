@@ -2,31 +2,31 @@
 	import '../app.postcss';
 	import Header from '$lib/components/header.svelte';
 	import Footer from '$lib/components/footer.svelte';
-	import { initInterceptors } from '$lib/store/auth/client';
-	import { auth } from '$lib/store/auth/auth.store';
-	import { SvelteToast } from '@zerodevx/svelte-toast';
+	// import { initInterceptors } from '$lib/store/auth/client';
+	// import { auth } from '$lib/store/auth/auth.store';
+	import { SvelteToast, toast } from '@zerodevx/svelte-toast';
 	import { Jumper } from 'svelte-loading-spinners';
-	import { navigating } from '$app/stores';
-	import { goto } from '$app/navigation';
+	import { auth } from '$lib/store/auth/auth.store';
 	import { browser } from '$app/environment';
+	import { initInterceptors } from '$lib/store/auth/client';
 	import type { LoginResponse } from '$lib/store/auth/auth.types';
+	import { navigating } from '$app/stores';
 	import { get } from 'svelte/store';
-
+	import { goto } from '$app/navigation';
 	auth.user.subscribe((user) => {
 		if (!browser) return;
 		const tokens = user?.tokens;
-
 		if (tokens?.accessToken) initInterceptors(tokens?.accessToken);
-
 		guardRoute(user);
+
+		toast.push(JSON.stringify(user, null, 2), {});
 	});
 
 	function guardRoute(user: LoginResponse | null | undefined) {
-		const route = $navigating?.to?.route.id;
-
+		const route = get(navigating)?.to?.route.id;
 		const authUser = get(auth.user);
 
-		if (authUser && route?.match(/login|register/)) {
+		if (authUser && route && route?.match(/login|register/)) {
 			return goto('/');
 		}
 
@@ -39,7 +39,6 @@
 
 	// listen to auth loading
 	let isLoading = false;
-
 	auth.loading.subscribe((value) => {
 		isLoading = value;
 	});
