@@ -1,4 +1,7 @@
 <script lang="ts">
+	export let data: ReturnType<typeof import('./+layout').load>;
+	const { productName } = data;
+
 	import '../app.postcss';
 	import Header from '$lib/components/header.svelte';
 	import Footer from '$lib/components/footer.svelte';
@@ -13,10 +16,10 @@
 	import { navigating } from '$app/stores';
 	import { get } from 'svelte/store';
 	import { goto } from '$app/navigation';
+
 	auth.user.subscribe((user) => {
 		if (!browser) return;
-		const tokens = user?.tokens;
-		if (tokens?.accessToken) initInterceptors(tokens?.accessToken);
+		initInterceptors();
 		guardRoute(user);
 
 		toast.push(JSON.stringify(user, null, 2), {});

@@ -2,14 +2,10 @@
 	import AppButton from '$lib/components/appButton.svelte';
 	import { getMyProfileAsync } from '$lib/store/auth/api';
 	import { auth } from '$lib/store/auth/auth.store';
-	import type { LoginResponse } from '$lib/store/auth/auth.types';
 	import { toast } from '@zerodevx/svelte-toast';
+	import { get } from 'svelte/store';
 
-	let user: LoginResponse | null | undefined;
-
-	auth.user.subscribe((value) => {
-		user = value;
-	});
+	let user = get(auth.user);
 
 	function handleClick() {
 		console.log('get my profile');
@@ -26,6 +22,6 @@
 <a href="/login">Login</a>
 
 <AppButton on:click={handleClick}>Get my profile</AppButton>
-<button on:click={handleClick}> Get my profile </button>
+<AppButton on:click={auth.logout}>Logout</AppButton>
 
 {JSON.stringify(user, null, 2)}

@@ -1,5 +1,7 @@
 import { PUBLIC_API_URL } from '$env/static/public';
 import axios from 'axios';
+import { get } from 'svelte/store';
+import { auth } from './auth.store';
 
 const client = axios.create({
 	baseURL: PUBLIC_API_URL,
@@ -9,9 +11,11 @@ const client = axios.create({
 	validateStatus: (status) => status < 500
 });
 
-export const initInterceptors = (accessToken: string) => {
+export const initInterceptors = () => {
+	const accessToken = get(auth.user)?.tokens?.accessToken;
+
 	client.interceptors.request.use((config) => {
-		if (accessToken && config.headers) {
+		if (config.headers && accessToken) {
 			config.headers.Authorization = `Bearer ${accessToken}`;
 		}
 

@@ -45,7 +45,9 @@ const createAuth = () => {
 		loading.set(true);
 
 		try {
-			await client.post('/api/auth/logout');
+			await client.post('/api/auth/logout', {
+				refreshToken: get(user)?.tokens?.refreshToken
+			});
 
 			user.set(null);
 
