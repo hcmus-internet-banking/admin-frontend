@@ -1,9 +1,10 @@
-import { get, writable } from 'svelte/store';
+import { get, writable, derived } from 'svelte/store';
 import type { Auth, LoginResponse } from './auth.types';
 import client from './client';
 import { handleResponse } from './handleResponse';
 import type { BaseResponse } from './handleResponse';
 import { goto } from '$app/navigation';
+import axios from 'axios';
 
 const createAuth = () => {
 	const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('user') : null;
@@ -12,6 +13,7 @@ const createAuth = () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const error = writable<BaseResponse<any> | null>(null);
 	const user = writable<Auth['user']>(stored ? JSON.parse(stored) : null);
+	const tokens = derived(user, ($user) => $user?.tokens);
 
 	async function login({ email, password }: { email: string; password: string }) {
 		error.set(null);
@@ -45,11 +47,9 @@ const createAuth = () => {
 		loading.set(true);
 
 		try {
-			await client.post('/api/auth/logout', {
+			await axios.post('/api/auth/logout', {
 				refreshToken: get(user)?.tokens?.refreshToken
 			});
-
-			user.set(null);
 
 			// navigate to home page svelte
 			goto('/');
@@ -58,6 +58,7 @@ const createAuth = () => {
 			error.set(err);
 		} finally {
 			loading.set(false);
+			user.set(null);
 		}
 	}
 
@@ -65,13 +66,15 @@ const createAuth = () => {
 		loading.set(true);
 
 		try {
-			const userValue = get(user);
-			const newUser: LoginResponse = {
-				...userValue,
-				tokens: { ...userValue?.tokens, accessToken }
-			};
-
-			user.set(newUser);
+			user.update((user) => {
+				if (user) {
+					return {
+						...user,
+						tokens: { ...user.tokens, accessToken }
+					};
+				}
+				return null;
+			});
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (err: any) {
 			error.set(err);
@@ -85,6 +88,7 @@ const createAuth = () => {
 		login,
 		logout,
 		updateAccessToken,
+		tokens,
 		error,
 		user
 	};

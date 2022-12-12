@@ -13,18 +13,13 @@ export interface BaseResponse<T> {
 
 export const handleResponse = async <T>(response: AxiosResponse<BaseResponse<T>>) => {
 	const status = response.status;
-	const authState = get(auth.user);
 
 	if (!isOk(status)) {
 		switch (status) {
 			case 401:
 				try {
 					//  if not login, then skip to the next case
-					if (!authState) {
-						break;
-					}
-
-					const refreshToken = authState.tokens?.refreshToken;
+					const refreshToken = get(auth.user)?.tokens?.refreshToken;
 
 					if (!refreshToken) {
 						throw new Error('Refresh token not found');
@@ -33,17 +28,40 @@ export const handleResponse = async <T>(response: AxiosResponse<BaseResponse<T>>
 					const {
 						data: { accessToken }
 					} = await refreshTokenAsync(refreshToken);
+					console.log('new token', accessToken);
 
 					if (!accessToken) {
 						throw new Error('Fetching new access token failed');
 					}
 
-					auth.updateAccessToken({
-						accessToken: accessToken
+					auth.user.update((user) => {
+						return {
+							...user,
+							tokens: {
+								...user?.tokens,
+								accessToken
+							}
+						};
 					});
+					// auth.updateAccessToken({
+					// 	accessToken: accessToken
+					// });
 
-					// reset
+					// refresh
+					const { config } = response;
+					const originalRequest = config;
+
+					if (!originalRequest.headers) {
+						originalRequest.headers = {};
+					}
+					console.log('data', accessToken);
+					originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
 					// queryClient.refetchQueries();
+
+					return await (
+						await client<T>(originalRequest)
+					).data;
 				} catch (error) {
 					auth.logout();
 				}

@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String  @id @default(uuid())
+  email     String  @unique
+  password  String
+  firstName String  @map("first_name")
+  lastName  String  @map("last_name")
+  balance   BigInt  @default(0)
+  tokens    Token[]
+
+  @@map("users")
+}
+
+enum TokenType {
+  RESET_PASSWORD
+  VERIFY_EMAIL
+  REFRESH
+}
+
+model Token {
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  token     String
+  type      TokenType
+  expiredAt DateTime  @map("expired_at")
+
+  isBlacklisted Boolean @default(false) @map("is_blacklisted")
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String? @map("user_id")
+
+  @@map("tokens")
+}

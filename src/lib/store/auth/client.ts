@@ -12,9 +12,9 @@ const client = axios.create({
 });
 
 export const initInterceptors = () => {
-	const accessToken = get(auth.user)?.tokens?.accessToken;
-
 	client.interceptors.request.use((config) => {
+		const accessToken = get(auth.user)?.tokens?.accessToken;
+
 		if (config.headers && accessToken) {
 			config.headers.Authorization = `Bearer ${accessToken}`;
 		}

@@ -17,6 +17,7 @@
 		type?: 'button' | 'submit';
 		preset?: keyof typeof presets;
 		btnSize?: 'sm' | 'md' | 'lg';
+		href?: string;
 	}
 
 	export const className = '';
@@ -37,8 +38,9 @@
 <button
 	class={`flex items-center justify-center rounded-lg py-2 hover:bg-opacity-80 transition-[transform,box-shadow] hover:-translate-y-0.5 ${
 		!className?.includes('px-') ? 'px-4' : ''
-	} ${presets[preset || 'filled'].classNames} ${className} ${sizeClass[size]}`}
-	class:cursor-not-allowed,opacity-50={disabled}
+	} ${disabled ? 'cursor-not-allowed opacity-50' : ''} ${
+		presets[preset || 'filled'].classNames
+	} ${className} ${sizeClass[size]}`}
 	disabled={disabled || isLoading}
 	on:click
 	{...$$restProps}
