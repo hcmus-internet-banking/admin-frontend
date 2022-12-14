@@ -1,9 +1,17 @@
+import { hashPassword } from './../../utils/bcrypt';
+import { TokenService } from './../../database/tokenService';
 import { t } from '$lib/trpc/t';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { prisma } from '$lib/utils/prisma';
 import { comparePassword } from '$lib/utils/bcrypt';
 import type { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { TokenType } from '@prisma/client';
+import moment from 'moment';
+import {
+	PUBLIC_ACCESS_TOKEN_EXPIRES_IN_MINUTES,
+	PUBLIC_REFRESH_TOKEN_EXPIRES_IN_DAYS
+} from '$env/static/public';
 
 export const auth = t.router({
 	login: t.procedure
@@ -13,11 +21,11 @@ export const auth = t.router({
 				password: z.string().min(8, 'Password must be at least 8 characters')
 			})
 		)
-		.mutation(async ({ input: { password, email: username } }) => {
+		.mutation(async ({ input: { password, email } }) => {
 			const user = await prisma.user
 				.findUniqueOrThrow({
 					where: {
-						email: username
+						email
 					}
 				})
 				.catch(() => {
@@ -27,14 +35,36 @@ export const auth = t.router({
 					});
 				});
 
-			if (await comparePassword(password, user.password)) {
+			const isPasswordCorrect = await comparePassword(password as string, user.password);
+
+			if (!isPasswordCorrect) {
 				throw new TRPCError({
 					code: 'BAD_REQUEST',
 					message: 'Incorrect password'
 				});
 			}
 
-			return { username };
+			const [refreshToken, accessToken] = await Promise.all([
+				TokenService.generateToken({
+					type: TokenType.REFRESH,
+					expiredAt: moment()
+						.add(parseInt(PUBLIC_REFRESH_TOKEN_EXPIRES_IN_DAYS) || 30, 'days')
+						.toDate(),
+					userId: user.id
+				}).then((token) => token?.token),
+				TokenService.generateAccessToken(
+					{ id: user.id },
+					PUBLIC_ACCESS_TOKEN_EXPIRES_IN_MINUTES || '15m'
+				)
+			]);
+
+			return {
+				email,
+				tokens: {
+					refreshToken,
+					accessToken
+				}
+			};
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		}),
 
@@ -52,7 +82,7 @@ export const auth = t.router({
 				.create({
 					data: {
 						email,
-						password,
+						password: await hashPassword(password),
 						firstName,
 						lastName
 					}
@@ -74,3 +104,9 @@ export const auth = t.router({
 			return user;
 		})
 });
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+BigInt.prototype.toJSON = function () {
+	return this.toString();
+};

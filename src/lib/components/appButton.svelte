@@ -16,16 +16,17 @@
 		isLoading?: boolean;
 		type?: 'button' | 'submit';
 		preset?: keyof typeof presets;
-		btnSize?: 'sm' | 'md' | 'lg';
 		href?: string;
+		leftIcon?: string;
+		size?: 'sm' | 'md' | 'lg';
 	}
 
-	export const className = '';
-	export const disabled = false;
-	export const leftIcon = '';
-	export const isLoading = false;
-	export const preset: $$Props['preset'] = 'filled';
-	export const size: $$Props['btnSize'] = 'md';
+	export let className = '';
+	export let disabled = false;
+	export let leftIcon = '';
+	export let isLoading = false;
+	export let preset: $$Props['preset'] = 'filled';
+	export let size: $$Props['size'] = 'md';
 
 	// @ts-ignore
 	const sizeClass: Record<$$Props['btnSize'], string> = {
@@ -40,7 +41,7 @@
 		!className?.includes('px-') ? 'px-4' : ''
 	} ${disabled ? 'cursor-not-allowed opacity-50' : ''} ${
 		presets[preset || 'filled'].classNames
-	} ${className} ${sizeClass[size]}`}
+	} ${className} ${sizeClass[size || 'md']}`}
 	disabled={disabled || isLoading}
 	on:click
 	{...$$restProps}

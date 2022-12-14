@@ -1,47 +1,16 @@
 import { get, writable, derived } from 'svelte/store';
-import type { Auth, LoginResponse } from './auth.types';
-import client from './client';
-import { handleResponse } from './handleResponse';
-import type { BaseResponse } from './handleResponse';
 import { goto } from '$app/navigation';
 import axios from 'axios';
+import type { RouterOutputs } from '$lib/trpc/router';
 
 const createAuth = () => {
 	const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('user') : null;
 
 	const loading = writable(false);
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const error = writable<BaseResponse<any> | null>(null);
-	const user = writable<Auth['user']>(stored ? JSON.parse(stored) : null);
+	const error = writable<any | null>(null);
+	const user = writable<RouterOutputs['auth']['login'] | null>(stored ? JSON.parse(stored) : null);
 	const tokens = derived(user, ($user) => $user?.tokens);
-
-	async function login({ email, password }: { email: string; password: string }) {
-		error.set(null);
-		loading.set(true);
-
-		try {
-			const res = await client.post<BaseResponse<LoginResponse>>('/api/auth/login', {
-				email,
-				password,
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
-				captchaValue: grecaptcha.getResponse()
-			});
-
-			const data = await handleResponse(res);
-
-			user.set(data);
-
-			// navigate to home page svelte
-			goto('/');
-
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} catch (err: any) {
-			error.set(err);
-		} finally {
-			loading.set(false);
-		}
-	}
 
 	async function logout() {
 		loading.set(true);
@@ -85,7 +54,6 @@ const createAuth = () => {
 
 	return {
 		loading,
-		login,
 		logout,
 		updateAccessToken,
 		tokens,
@@ -94,10 +62,10 @@ const createAuth = () => {
 	};
 };
 
-export const auth = createAuth();
+export const authStore = createAuth();
 
 // Connect to localStorage
-auth.user.subscribe((user) => {
+authStore.user.subscribe((user) => {
 	if (user) {
 		localStorage.setItem('user', JSON.stringify(user));
 	} else {

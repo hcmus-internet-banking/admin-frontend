@@ -1,29 +1,17 @@
 <script lang="ts">
-	import AppButton from '$lib/components/appButton.svelte';
-	import { getMyProfileAsync } from '$lib/store/auth/api';
-	import { auth } from '$lib/store/auth/auth.store';
+	import { authStore } from '$lib/store/auth/auth.store';
 	import { get } from 'svelte/store';
-	import { toast } from 'svelte-french-toast';
 
-	let user = get(auth.user);
-
-	function handleClick() {
-		getMyProfileAsync().then((res) => {
-			toast.success(JSON.stringify(res, null, 2), {});
-		});
-	}
+	let user = get(authStore.user);
 </script>
 
 <h1>Welcome to SvelteKit</h1>
 
 <!-- link to login page -->
-<div class="grid space-y-2">
+<div class="grid">
 	<a href="/login">Login</a>
-
-	<AppButton on:click={handleClick}>Get my profile</AppButton>
-	<AppButton on:click={auth.logout}>Logout</AppButton>
-
 	<a href="/admin">Admin</a>
+	<span class="whitespace-pre-wrap overflow-scroll p-2 rounded bg-green-100">
+		{JSON.stringify(user, null, 2)}
+	</span>
 </div>
-
-{JSON.stringify(user, null, 2)}

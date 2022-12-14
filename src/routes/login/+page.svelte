@@ -6,9 +6,12 @@
 	import { toast } from 'svelte-french-toast';
 	import { tryParseTRPCError } from '$lib/utils/trpc';
 	import { onMount } from 'svelte';
+	import { authStore } from '$lib/store/auth/auth.store';
+	import { goto } from '$app/navigation';
 
 	let email = '';
 	let password = '';
+	let loading = false;
 
 	onMount(() => {
 		email = 'hopthucuatin@gmail.com';
@@ -16,22 +19,34 @@
 	});
 
 	async function handleSubmit() {
-		// auth.login({ email, password });
 		try {
+			loading = true;
 			const res = await trpc($page).auth.login.mutate({ email, password });
 
 			toast.success(JSON.stringify(res, null, 2));
+
+			authStore.user.set(res);
+			goto('/');
 		} catch (e: any) {
 			const errors = await tryParseTRPCError(e);
 
 			toast.error(errors.join('<br />'));
+		} finally {
+			loading = false;
 		}
 	}
 </script>
 
-<div class="max-w-[18rem] mx-auto mt-20">
+<div class="max-w-md mx-auto w-full mt-20">
 	<form class="grid space-y-2" on:submit|preventDefault={handleSubmit}>
-		<AppInput bind:value={email} placeholder="Email" clearable autocomplete="email" />
+		<AppInput
+			bind:value={email}
+			placeholder="Email"
+			clearable
+			autocomplete="email"
+			disabled={loading}
+			isLoading={loading}
+		/>
 		<AppInput
 			type="password"
 			bind:value={password}
@@ -39,10 +54,13 @@
 			clearable
 			hiddenable
 			autocomplete="current-password"
+			isLoading={loading}
+			disabled={loading}
 		/>
-		<div id="recaptcha_button" />
-		<AppButton type="submit" btnSize="md">Login</AppButton>
-		<a href="/register">Register</a>
+		<!-- <div class="justify-center flex">
+			<div id="recaptcha_button" />
+		</div> -->
+		<AppButton type="submit" size="md" isLoading={loading} disabled={loading}>Login</AppButton>
 	</form>
 </div>
 
