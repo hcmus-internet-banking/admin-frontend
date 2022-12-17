@@ -89,7 +89,7 @@ const createAuth = () => {
 				error,
 				loading,
 				fn: async () => {
-					const res = await client.post('/api/employee/auth/logout', {
+					const res = await axios.post(`${PUBLIC_API_URL}/api/employee/auth/logout`, {
 						refreshToken: get(user)?.tokens?.refreshToken
 					});
 					// navigate to home page svelte
