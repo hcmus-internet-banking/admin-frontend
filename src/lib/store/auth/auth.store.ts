@@ -1,7 +1,7 @@
 import { get, writable, derived } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { withLoading } from '$lib/core/withLoading';
-import client, { guardRoute, initInterceptors } from '$lib/utils/client';
+import { guardRoute, initInterceptors } from '$lib/utils/client';
 import { browser } from '$app/environment';
 import { queryClient } from '$lib/queries';
 import axios from 'axios';
