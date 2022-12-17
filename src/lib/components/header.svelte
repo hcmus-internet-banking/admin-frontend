@@ -3,17 +3,19 @@
 
 	import { page } from '$app/stores';
 	import { authStore } from '$lib/store/auth/auth.store';
-	import { get } from 'svelte/store';
 
 	$: currentPage = $page.url.pathname;
 
-	$: user = get(authStore.user);
+	let isLoggedIn: boolean;
+	authStore.user.subscribe((user) => {
+		isLoggedIn = !!user;
+	});
 </script>
 
 <header class="flex gap-2 justify-between items-center mt-4">
 	<a href="/" class="text-2xl font-bold text-gray-800"> HCMUS-Bank Admin </a>
 
-	{#if user?.tokens?.refreshToken}
+	{#if isLoggedIn}
 		<AppButton on:click={authStore.logout}>Logout</AppButton>
 	{:else}
 		<!-- Router is /login -->
