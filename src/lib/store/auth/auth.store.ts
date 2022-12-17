@@ -110,20 +110,24 @@ const createAuth = () => {
 	}
 
 	async function refreshAccessToken() {
-		const { data } = await axios.post<BaseResponse<{ accessToken: string }>>(
-			`${PUBLIC_API_URL}/api/employee/auth/refresh`,
-			{
-				refreshToken: get(user)?.tokens?.refreshToken
+		try {
+			const { data } = await axios.post<BaseResponse<{ accessToken: string }>>(
+				`${PUBLIC_API_URL}/api/employee/auth/refresh`,
+				{
+					refreshToken: get(user)?.tokens?.refreshToken
+				}
+			);
+
+			if (!data.data) {
+				logout();
+				return;
 			}
-		);
 
-		if (!data.data) {
+			const { accessToken } = data.data;
+			updateAccessToken({ accessToken });
+		} catch (error) {
 			logout();
-			return;
 		}
-
-		const { accessToken } = data.data;
-		updateAccessToken({ accessToken });
 	}
 
 	// Any of these will trigger once the first time
