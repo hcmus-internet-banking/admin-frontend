@@ -16,7 +16,11 @@ export const initInterceptors = () => {
 	client.interceptors.request.use((config) => {
 		const accessToken = get(authStore.user)?.tokens?.accessToken;
 
-		if (config.headers && accessToken) {
+		if (!accessToken) {
+			return Promise.reject();
+		}
+
+		if (config.headers) {
 			config.headers.Authorization = `Bearer ${accessToken}`;
 		}
 
