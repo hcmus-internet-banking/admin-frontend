@@ -4,6 +4,8 @@ import { withLoading } from '$lib/core/withLoading';
 import client, { guardRoute, initInterceptors } from '$lib/utils/client';
 import { browser } from '$app/environment';
 import { queryClient } from '$lib/queries';
+import axios from 'axios';
+import { PUBLIC_API_URL } from '$env/static/public';
 
 export type BaseResponse<T> = {
 	data: T;
@@ -108,8 +110,8 @@ const createAuth = () => {
 	}
 
 	async function refreshAccessToken() {
-		const { data } = await client.post<BaseResponse<{ accessToken: string }>>(
-			'/api/employee/auth/refresh',
+		const { data } = await axios.post<BaseResponse<{ accessToken: string }>>(
+			`${PUBLIC_API_URL}/api/employee/auth/refresh`,
 			{
 				refreshToken: get(user)?.tokens?.refreshToken
 			}
