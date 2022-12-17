@@ -11,7 +11,7 @@
 </script>
 
 <header class="flex gap-2 justify-between items-center mt-4">
-	<a href="/" class="text-2xl font-bold text-gray-800">Admin</a>
+	<a href="/" class="text-2xl font-bold text-gray-800"> HCMUS-Bank Admin </a>
 
 	{#if user?.tokens?.refreshToken}
 		<AppButton on:click={authStore.logout}>Logout</AppButton>

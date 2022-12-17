@@ -22,8 +22,6 @@
 			loading = true;
 			const res = await authStore.login({ email, password });
 
-			toast.success(JSON.stringify(res, null, 2));
-
 			authStore.user.set(res?.data ?? null);
 			goto('/');
 		} catch (e: any) {

@@ -7,6 +7,10 @@
 		outlined: {
 			classNames: 'bg-transparent border border-blue-500 text-blue-500',
 			shadow: ''
+		},
+		error: {
+			classNames: 'bg-red-500 text-white',
+			shadow: 'shadow-md hover:shadow-lg hover:shadow-red-300 hover:shadow-opacity-50'
 		}
 	};
 
@@ -18,7 +22,7 @@
 		preset?: keyof typeof presets;
 		href?: string;
 		leftIcon?: string;
-		size?: 'sm' | 'md' | 'lg';
+		size?: 'xs' | 'sm' | 'md' | 'lg';
 	}
 
 	export let className = '';
@@ -30,6 +34,7 @@
 
 	// @ts-ignore
 	const sizeClass: Record<$$Props['btnSize'], string> = {
+		xs: 'h-6 text-xs',
 		sm: 'h-8 text-sm',
 		md: 'h-10',
 		lg: 'h-[3.25rem]'

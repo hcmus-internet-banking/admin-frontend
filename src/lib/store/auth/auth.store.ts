@@ -1,7 +1,9 @@
 import { get, writable, derived } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { withLoading } from '$lib/core/withLoading';
-import client from '$lib/utils/client';
+import client, { guardRoute, initInterceptors } from '$lib/utils/client';
+import { browser } from '$app/environment';
+import { queryClient } from '$lib/queries';
 
 export type BaseResponse<T> = {
 	data: T;
@@ -37,6 +39,7 @@ const createAuth = () => {
 	const error = writable<BaseErrorResponse | null>(null);
 	const user = writable<LoginResponse | null>(stored ? JSON.parse(stored) : null);
 	const tokens = derived(user, ($user) => $user?.tokens);
+	const isInit = writable(false);
 
 	async function updateAccessToken({ accessToken }: { accessToken: string }) {
 		loading.set(true);
@@ -93,7 +96,14 @@ const createAuth = () => {
 					return res.data;
 				}
 			},
-			{ onSettled: () => user.set(null) }
+			{
+				onSettled: () => {
+					// clear cache
+					queryClient.clear();
+
+					return user.set(null);
+				}
+			}
 		);
 	}
 
@@ -114,7 +124,19 @@ const createAuth = () => {
 		updateAccessToken({ accessToken });
 	}
 
+	// Any of these will trigger once the first time
+	async function initialize() {
+		if (get(isInit)) return;
+		if (!browser) return;
+
+		initInterceptors();
+		guardRoute();
+		isInit.set(true);
+	}
+
 	return {
+		initialize,
+		isInit: derived(isInit, ($isInit) => $isInit),
 		loading,
 		login,
 		logout,

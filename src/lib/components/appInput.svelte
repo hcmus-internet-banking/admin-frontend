@@ -1,4 +1,6 @@
 <script lang="ts">
+	import classNames from 'classnames';
+
 	interface $$Props extends svelte.JSX.HTMLAttributes<HTMLElementTagNameMap['input']> {
 		value?: string;
 		placeholder?: string;
@@ -9,6 +11,8 @@
 		disabled?: boolean;
 		isLoading?: boolean;
 		required?: boolean;
+		size?: 'sm' | 'md' | 'lg';
+		containerClass?: string;
 	}
 
 	export let value = '';
@@ -20,6 +24,8 @@
 	export let disabled = false;
 	export let required = false;
 	export let isLoading = false;
+	export let size: $$Props['size'] = 'md';
+	export let containerClass = '';
 
 	let input: HTMLInputElement;
 	let hiddenValue = false;
@@ -39,11 +45,21 @@
 	}
 </script>
 
-<label class="relative inline-block w-full">
+<label class={classNames('relative inline-block w-full', containerClass)}>
 	<input
-		class="peer w-full rounded-xl bg-gray-100 px-3 outline-none transition-[padding,box-shadow] focus:shadow-md h-12{className
-			? ` ${className}`
-			: ''} {value?.length ? 'pt-4 pb-1' : 'pt-3 pb-2'} focus:pt-4 focus:pb-1"
+		class={classNames(
+			'peer w-full rounded-xl bg-gray-100 px-3 outline-none transition-[padding,box-shadow] focus:shadow-md',
+			className,
+			{
+				'focus:pt-4 focus:pb-1': placeholder
+			},
+			placeholder ? (value?.length ? 'pt-4 pb-1' : 'pt-3 pb-2') : 'py-3',
+			{
+				'h-10': size === 'sm',
+				'h-12': size === 'md',
+				'h-14': size === 'lg'
+			}
+		)}
 		class:cursor-not-allowed,bg-gray-300={disabled}
 		{disabled}
 		placeholder=" "
@@ -51,15 +67,16 @@
 		bind:value
 		bind:this={input}
 	/>
-	<span
-		class="absolute left-3 top-1 select-none text-xs text-gray-500 transition-[top,font-size] placeholder-shown:text-sm peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1 peer-focus:text-xs"
-	>
-		{placeholder}
-		{#if required}
-			<span class="text-red-500">*</span>
-		{/if}
-	</span>
-
+	{#if placeholder}
+		<span
+			class="absolute left-3 top-1 select-none text-xs text-gray-500 transition-[top,font-size] placeholder-shown:text-sm peer-placeholder-shown:top-4 peer-placeholder-shown:text-sm peer-focus:top-1 peer-focus:text-xs"
+		>
+			{placeholder}
+			{#if required}
+				<span class="text-red-500">*</span>
+			{/if}
+		</span>
+	{/if}
 	{#if !disabled}
 		<span class="absolute right-4 top-4 flex cursor-pointer items-center gap-1">
 			{#if isLoading}

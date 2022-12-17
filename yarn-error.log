@@ -1,0 +1,83 @@
+Arguments: 
+  /opt/homebrew/Cellar/node/19.1.0/bin/node /opt/homebrew/bin/yarn add -D zod
+
+PATH: 
+  /Users/tinnt/Library/pnpm:/Users/tinnt/.scripts:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/opt/homebrew/bin
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  19.1.0
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  Error: ENOENT: no such file or directory, copyfile '/Users/tinnt/Library/Caches/Yarn/v6/npm-glob-parent-6.0.2-6d237d99083950c79290f24c7642a3de9a28f9e3-integrity/node_modules/glob-parent/LICENSE' -> '/Users/tinnt/Coding/School/web-nang-cao/ibanking-web-admin/node_modules/eslint/node_modules/glob-parent/LICENSE'
+
+npm manifest: 
+  {
+  	"name": "svelte-app",
+  	"version": "0.0.1",
+  	"private": true,
+  	"scripts": {
+  		"dev": "vite dev",
+  		"build": "vite build",
+  		"preview": "vite preview",
+  		"test": "playwright test",
+  		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+  		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+  		"test:unit": "vitest",
+  		"lint": "prettier --plugin-search-dir . --check . && eslint .",
+  		"format": "prettier --plugin-search-dir . --write .",
+  		"postinstall": "npx prisma generate"
+  	},
+  	"devDependencies": {
+  		"@playwright/test": "^1.28.1",
+  		"@prisma/client": "^4.7.1",
+  		"@sveltejs/adapter-auto": "next",
+  		"@sveltejs/kit": "next",
+  		"@sveltestack/svelte-query": "^1.6.0",
+  		"@types/bcryptjs": "^2.4.2",
+  		"@types/jsonwebtoken": "^8.5.9",
+  		"@typescript-eslint/eslint-plugin": "^5.45.0",
+  		"@typescript-eslint/parser": "^5.45.0",
+  		"autoprefixer": "^10.4.7",
+  		"axios": "^1.2.1",
+  		"bcrypt": "^5.1.0",
+  		"bcryptjs": "^2.4.3",
+  		"eslint": "^8.28.0",
+  		"eslint-config-prettier": "^8.5.0",
+  		"eslint-plugin-svelte3": "^4.0.0",
+  		"jsonwebtoken": "^8.5.1",
+  		"moment": "^2.29.4",
+  		"postcss": "^8.4.14",
+  		"postcss-load-config": "^4.0.1",
+  		"prettier": "^2.8.0",
+  		"prettier-plugin-svelte": "^2.8.1",
+  		"svelte": "^3.54.0",
+  		"svelte-check": "^2.9.2",
+  		"svelte-french-toast": "^1.0.3",
+  		"svelte-loading-spinners": "^0.3.4",
+  		"svelte-preprocess": "^4.10.7",
+  		"tailwindcss": "^3.1.5",
+  		"tslib": "^2.4.1",
+  		"typescript": "^4.9.3",
+  		"vite": "^4.0.0",
+  		"vitest": "^0.25.3",
+  		"zod": "^3.20.0"
+  	},
+  	"type": "module",
+  	"dependencies": {
+  		"@trpc/client": "^10.5.0",
+  		"@trpc/server": "^10.5.0",
+  		"trpc-sveltekit": "^3.1.1"
+  	}
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
