@@ -69,8 +69,8 @@ const createAuth = () => {
 			error,
 			loading,
 			fn: async () => {
-				const { data } = await client.post<BaseResponse<LoginResponse>>(
-					'/api/employee/auth/login',
+				const { data } = await axios.post<BaseResponse<LoginResponse>>(
+					`${PUBLIC_API_URL}/api/employee/auth/login`,
 					{
 						email,
 						password
