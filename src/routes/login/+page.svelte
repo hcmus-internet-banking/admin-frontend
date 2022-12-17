@@ -1,7 +1,6 @@
 <script lang="ts">
 	import AppButton from '$lib/components/appButton.svelte';
 	import AppInput from '$lib/components/appInput.svelte';
-	import { trpc } from '$lib/trpc/client';
 	import { page } from '$app/stores';
 	import { toast } from 'svelte-french-toast';
 	import { tryParseTRPCError } from '$lib/utils/trpc';
@@ -14,18 +13,18 @@
 	let loading = false;
 
 	onMount(() => {
-		email = 'hopthucuatin@gmail.com';
-		password = 'aimabiet';
+		email = 'employee1@yopmail.com';
+		password = 'password';
 	});
 
 	async function handleSubmit() {
 		try {
 			loading = true;
-			const res = await trpc($page).auth.login.mutate({ email, password });
+			const res = await authStore.login({ email, password });
 
 			toast.success(JSON.stringify(res, null, 2));
 
-			authStore.user.set(res);
+			authStore.user.set(res?.data ?? null);
 			goto('/');
 		} catch (e: any) {
 			const errors = await tryParseTRPCError(e);

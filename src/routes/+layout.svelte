@@ -1,36 +1,27 @@
 <script lang="ts">
-	import toast, { Toaster } from 'svelte-french-toast';
+	import { Toaster } from 'svelte-french-toast';
 	import '../app.postcss';
 	import Header from '$lib/components/header.svelte';
 	import Footer from '$lib/components/footer.svelte';
 	import { Jumper } from 'svelte-loading-spinners';
 	import { authStore } from '$lib/store/auth/auth.store';
 	import { browser } from '$app/environment';
-	import { initInterceptors } from '$lib/store/auth/client';
+	import { guardRoute, initInterceptors } from '$lib/utils/client';
 	import { navigating } from '$app/stores';
-	import { get } from 'svelte/store';
-	import { goto } from '$app/navigation';
 
+	// Any of these will trigger once the first time
 	initInterceptors();
 
+	// First login and when logout => guard route
 	authStore.user.subscribe((user) => {
 		if (!browser) return;
-
 		guardRoute();
 	});
 
-	function guardRoute() {
-		const route = get(navigating)?.to?.route.id;
-		const authUser = get(authStore.user);
-
-		if (!authUser && !route?.match(/login|register/)) {
-			return goto('/login');
-		}
-	}
-
+	// Guard route when navigating
 	$: if ($navigating) guardRoute();
 
-	// listen to auth loading
+	// Globally listen to auth loading
 	let isLoading = false;
 	authStore.loading.subscribe((value) => {
 		isLoading = value;

@@ -1,35 +1,42 @@
 import { get, writable, derived } from 'svelte/store';
 import { goto } from '$app/navigation';
-import axios from 'axios';
-import type { RouterOutputs } from '$lib/trpc/router';
+import { withLoading } from '$lib/core/withLoading';
+import client from '$lib/utils/client';
+
+export type BaseResponse<T> = {
+	data: T;
+};
+
+export type BaseErrorResponse = {
+	error: {
+		message?: string;
+	};
+};
+
+interface LoginResponse {
+	employee: Employee;
+	tokens: Tokens;
+}
+
+interface Tokens {
+	refreshToken: string;
+	accessToken: string;
+}
+
+interface Employee {
+	id: string;
+	firstName: string;
+	lastName: string;
+	employeeType: string;
+}
 
 const createAuth = () => {
 	const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('user') : null;
 
 	const loading = writable(false);
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const error = writable<any | null>(null);
-	const user = writable<RouterOutputs['auth']['login'] | null>(stored ? JSON.parse(stored) : null);
+	const error = writable<BaseErrorResponse | null>(null);
+	const user = writable<LoginResponse | null>(stored ? JSON.parse(stored) : null);
 	const tokens = derived(user, ($user) => $user?.tokens);
-
-	async function logout() {
-		loading.set(true);
-
-		try {
-			await axios.post('/api/auth/logout', {
-				refreshToken: get(user)?.tokens?.refreshToken
-			});
-
-			// navigate to home page svelte
-			goto('/');
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		} catch (err: any) {
-			error.set(err);
-		} finally {
-			loading.set(false);
-			user.set(null);
-		}
-	}
 
 	async function updateAccessToken({ accessToken }: { accessToken: string }) {
 		loading.set(true);
@@ -52,10 +59,66 @@ const createAuth = () => {
 		}
 	}
 
+	async function login({ email, password }: { email: string; password: string }) {
+		return await withLoading({
+			error,
+			loading,
+			fn: async () => {
+				const { data } = await client.post<BaseResponse<LoginResponse>>(
+					'/api/employee/auth/login',
+					{
+						email,
+						password
+					}
+				);
+				user.set(data.data);
+
+				return data;
+			}
+		});
+	}
+
+	async function logout() {
+		return await withLoading(
+			{
+				error,
+				loading,
+				fn: async () => {
+					const res = await client.post('/api/employee/auth/logout', {
+						refreshToken: get(user)?.tokens?.refreshToken
+					});
+					// navigate to home page svelte
+					goto('/');
+
+					return res.data;
+				}
+			},
+			{ onSettled: () => user.set(null) }
+		);
+	}
+
+	async function refreshAccessToken() {
+		const { data } = await client.post<BaseResponse<{ accessToken: string }>>(
+			'/api/employee/auth/refresh',
+			{
+				refreshToken: get(user)?.tokens?.refreshToken
+			}
+		);
+
+		if (!data.data) {
+			logout();
+			return;
+		}
+
+		const { accessToken } = data.data;
+		updateAccessToken({ accessToken });
+	}
+
 	return {
 		loading,
+		login,
 		logout,
-		updateAccessToken,
+		refreshAccessToken,
 		tokens,
 		error,
 		user
@@ -63,6 +126,7 @@ const createAuth = () => {
 };
 
 export const authStore = createAuth();
+export type AuthStore = ReturnType<typeof createAuth>;
 
 // Connect to localStorage
 authStore.user.subscribe((user) => {
