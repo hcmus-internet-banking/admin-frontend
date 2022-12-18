@@ -2,7 +2,6 @@ import type { BaseResponse } from '$lib/store/auth/auth.store';
 import client from '$lib/utils/client';
 import { useMutation, useQuery } from '@sveltestack/svelte-query';
 import { z } from 'zod';
-import { queryClient } from '.';
 
 export interface EmployeeResponse {
 	data: Employee[];
@@ -45,8 +44,6 @@ export const useUpdateEmployee = () => {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			onSuccess(data, variables, context) {
 				console.log('Invalidating employee queries');
-
-				queryClient.clear();
 			}
 		}
 	);
@@ -61,4 +58,13 @@ export const useFetchAllEmployees = ({ limit, offset }: { limit: number; offset:
 			enabled: limit > 0 && offset >= 0
 		}
 	);
+};
+
+export const useDeleteEmployee = () => {
+	return useMutation((id: string) => client.delete(`/api/employee/${id}`), {
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		onSuccess(data, variables, context) {
+			console.log('Invalidating employee queries');
+		}
+	});
 };
