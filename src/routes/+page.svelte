@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { LightPaginationNav } from 'svelte-paginate';
 	import AppButton from '$lib/components/appButton.svelte';
-	import { putEmployeeSchema, useUpdateEmployee } from '$lib/queries/employee';
+	import {
+		putEmployeeSchema,
+		useFetchAllEmployees,
+		useUpdateEmployee
+	} from '$lib/queries/employee';
 	import type { PutEmployee } from '$lib/queries/employee';
 	import type { EmployeeResponse } from '$lib/queries/employee';
 	import type { BaseResponse } from '$lib/store/auth/auth.store';
@@ -56,18 +60,10 @@
 		}
 	];
 
-	const fetchEmployees = async (offset: number) => {
-		const response = await client.get<BaseResponse<EmployeeResponse>>('/api/employee', {
-			params: {
-				limit,
-				offset
-			}
-		});
-
-		return response.data.data;
-	};
+	const queryResult = useFetchAllEmployees({ limit, offset });
 
 	const updateEmployee = useUpdateEmployee();
+	let refetched = false;
 
 	const handleSaveClick = async () => {
 		const { data, employeeId } = editState || {};
@@ -92,134 +88,131 @@
 			// @ts-ignore
 			success: (data) => {
 				editState = null;
+				refetched = false;
 				return `Edit user ${data.data.data.firstName} ${data.data.data.lastName} success!`;
 			},
 			//@ts-ignore
 			error: (e) => {
-				return `${JSON.stringify(e)}`;
+				return e.message || 'Something went wrong';
 			}
 		});
 	};
 
-	$: queryOptions = {
-		queryKey: ['employees', { limit, offset }],
-		queryFn: async () => await fetchEmployees(offset)
-	};
+	$: if (refetched === false) {
+		$queryResult.refetch();
+		refetched = true;
+	}
 </script>
 
 <div class="grid space-y-4">
 	<h1 class="text-sm">Welcome to SvelteKit</h1>
 
-	<Query options={queryOptions}>
-		<div slot="query" let:queryResult>
-			<section class="overflow-x-auto rounded-md border">
-				{#if !queryResult?.data}
-					<Spinner />
-				{:else}
-					<table class="md:table-fixed w-full whitespace-nowrap">
-						<thead>
-							<tr class="text-left text-sm font-semibold bg-gray-200 truncate">
-								{#each columns as column}
-									<th class="p-4">{column.label}</th>
-								{/each}
-							</tr>
-						</thead>
-						<tbody>
-							{#each queryResult.data.data || [] as employee, i}
-								<tr
-									class={classNames('text-left', {
-										'bg-gray-200': i % 2 === 1
-									})}
-								>
-									{#each columns as column}
-										{#if column.name === 'actions'}
-											<td class="flex space-x-1.5 h-14 items-center min-w-min">
-												{#if editState?.rowIndex === i}
-													<AppButton
-														preset="filled"
-														size="xs"
-														on:click={handleSaveClick}
-														disabled={$updateEmployee.isLoading}
-													>
-														<SaveOutline class="h-4" />
-													</AppButton>
-												{/if}
-												<AppButton
-													preset="outlined"
-													size="xs"
-													on:click={() => {
-														if (editState?.rowIndex === i) {
-															editState = null;
-															return;
-														}
+	<section class="overflow-x-auto rounded-md border">
+		{#if !$queryResult?.data}
+			<Spinner />
+		{:else}
+			<table class="md:table-fixed w-full whitespace-nowrap">
+				<thead>
+					<tr class="text-left text-sm font-semibold bg-gray-200 truncate">
+						{#each columns as column}
+							<th class="p-4">{column.label}</th>
+						{/each}
+					</tr>
+				</thead>
+				<tbody>
+					{#each $queryResult.data.data.data.data || [] as employee, i}
+						<tr
+							class={classNames('text-left', {
+								'bg-gray-200': i % 2 === 1
+							})}
+						>
+							{#each columns as column}
+								{#if column.name === 'actions'}
+									<td class="flex space-x-1.5 h-14 items-center min-w-min">
+										{#if editState?.rowIndex === i}
+											<AppButton
+												preset="filled"
+												size="xs"
+												on:click={handleSaveClick}
+												disabled={$updateEmployee.isLoading}
+											>
+												<SaveOutline class="h-4" />
+											</AppButton>
+										{/if}
+										<AppButton
+											preset="outlined"
+											size="xs"
+											on:click={() => {
+												if (editState?.rowIndex === i) {
+													editState = null;
+													return;
+												}
 
-														editState = {
-															data: {
-																...employee
-															},
-															rowIndex: i,
-															employeeId: employee.id
-														};
-													}}
-												>
-													<CreateOutline class="h-4" />
-												</AppButton>
-												<AppButton preset="error" size="xs">
-													<TrashOutline class="h-4" />
-												</AppButton>
-											</td>
-										{:else if column.name === 'id'}
+												editState = {
+													data: {
+														...employee
+													},
+													rowIndex: i,
+													employeeId: employee.id
+												};
+											}}
+										>
+											<CreateOutline class="h-4" />
+										</AppButton>
+										<AppButton preset="error" size="xs">
+											<TrashOutline class="h-4" />
+										</AppButton>
+									</td>
+								{:else if column.name === 'id'}
+									<div class="ml-4 truncate">
+										{employee[column.name]}
+									</div>
+								{:else}
+									<td class="h-14">
+										<WrapComponent condition={editState?.rowIndex !== i}>
 											<div class="ml-4 truncate">
 												{employee[column.name]}
 											</div>
-										{:else}
-											<td class="h-14">
-												<WrapComponent condition={editState?.rowIndex !== i}>
-													<div class="ml-4 truncate">
-														{employee[column.name]}
-													</div>
-													<svelte:fragment slot="fallback">
-														<AppInput
-															size="sm"
-															className="h-full"
-															containerClass="px-2"
-															disabled={$updateEmployee.isLoading}
-															on:change={(e) => {
-																if (editState)
-																	editState = {
-																		...editState,
-																		data: {
-																			...editState?.data,
-																			// @ts-ignore
-																			[column.name]: e?.target?.value
-																		}
-																	};
-															}}
-															value={editState?.data[column.name]}
-														/>
-													</svelte:fragment>
-												</WrapComponent>
-											</td>
-										{/if}
-									{/each}
-								</tr>
+											<svelte:fragment slot="fallback">
+												<AppInput
+													size="sm"
+													className="h-full"
+													containerClass="px-2"
+													disabled={$updateEmployee.isLoading}
+													on:change={(e) => {
+														if (editState)
+															editState = {
+																...editState,
+																data: {
+																	...editState?.data,
+																	// @ts-ignore
+																	[column.name]: e?.target?.value
+																}
+															};
+													}}
+													value={editState?.data[column.name]}
+												/>
+											</svelte:fragment>
+										</WrapComponent>
+									</td>
+								{/if}
 							{/each}
-						</tbody>
-					</table>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
 
-					<LightPaginationNav
-						totalItems={queryResult.data.metadata.total}
-						pageSize={limit}
-						currentPage={Math.ceil(offset / limit) + 1}
-						{limit}
-						showStepOptions={true}
-						on:setPage={(e) => {
-							offset = e.detail.page * limit - limit;
-							editState = null;
-						}}
-					/>
-				{/if}
-			</section>
-		</div>
-	</Query>
+			<LightPaginationNav
+				totalItems={$queryResult.data.data.data.metadata.total}
+				pageSize={limit}
+				currentPage={Math.ceil(offset / limit) + 1}
+				{limit}
+				showStepOptions={true}
+				on:setPage={(e) => {
+					offset = e.detail.page * limit - limit;
+					editState = null;
+				}}
+			/>
+		{/if}
+	</section>
 </div>

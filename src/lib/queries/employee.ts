@@ -1,5 +1,6 @@
+import type { BaseResponse } from '$lib/store/auth/auth.store';
 import client from '$lib/utils/client';
-import { useMutation } from '@sveltestack/svelte-query';
+import { useMutation, useQuery } from '@sveltestack/svelte-query';
 import { z } from 'zod';
 import { queryClient } from '.';
 
@@ -47,6 +48,17 @@ export const useUpdateEmployee = () => {
 
 				queryClient.clear();
 			}
+		}
+	);
+};
+
+export const useFetchAllEmployees = ({ limit, offset }: { limit: number; offset: number }) => {
+	return useQuery(
+		['employees', limit, offset],
+		() =>
+			client.get<BaseResponse<EmployeeResponse>>(`/api/employee?limit=${limit}&offset=${offset}`),
+		{
+			enabled: limit > 0 && offset >= 0
 		}
 	);
 };
