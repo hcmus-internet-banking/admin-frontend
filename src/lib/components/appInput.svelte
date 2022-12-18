@@ -66,6 +66,7 @@
 		{...$$restProps}
 		bind:value
 		bind:this={input}
+		on:change
 	/>
 	{#if placeholder}
 		<span

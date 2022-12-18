@@ -1,22 +1,52 @@
-import type { BaseResponse } from '$lib/store/auth/auth.store';
 import client from '$lib/utils/client';
-import { useQuery } from '@sveltestack/svelte-query';
+import { useMutation } from '@sveltestack/svelte-query';
+import { z } from 'zod';
+import { queryClient } from '.';
+
+export interface EmployeeResponse {
+	data: Employee[];
+	metadata: Metadata;
+}
+
+interface Metadata {
+	total: number;
+	page: number;
+	limit: number;
+	hasNextPage: boolean;
+	hasPrevPage: boolean;
+}
+
+export const putEmployeeSchema = z.object({
+	email: z.string().email().optional(),
+	employeeType: z.enum(['ADMIN', 'EMPLOYEE']).optional(),
+	firstName: z.string().min(1).optional(),
+	lastName: z.string().min(1).optional(),
+	password: z.string().min(1).optional()
+});
 
 export interface Employee {
 	id: string;
 	firstName: string;
 	lastName: string;
-	employeeType: string;
+	employeeType: z.infer<typeof putEmployeeSchema>['employeeType'];
+	email: string;
+	createdAt: string;
+	password: string;
+	updatedAt: string;
 }
 
-export const useGetEmployees = (limit: number, offset: number) =>
-	useQuery(['employees'], async () => {
-		const response = await client.get<BaseResponse<Employee[]>>('/api/employee', {
-			params: {
-				limit,
-				offset
-			}
-		});
+export type PutEmployee = z.infer<typeof putEmployeeSchema>;
 
-		return response.data.data;
-	});
+export const useUpdateEmployee = () => {
+	return useMutation(
+		({ data, id }: { id: string; data: PutEmployee }) => client.put(`/api/employee/${id}`, data),
+		{
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			onSuccess(data, variables, context) {
+				console.log('Invalidating employee queries');
+
+				queryClient.clear();
+			}
+		}
+	);
+};

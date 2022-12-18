@@ -1,14 +1,16 @@
 <script lang="ts">
-	import type { ComponentType, SvelteComponentTyped } from 'svelte';
-
 	export let condition = true;
-	export let component: ComponentType<SvelteComponentTyped>;
 
 	// interface $$Props extends
+
+	interface $$Slot {
+		default: {};
+		fallback: {};
+	}
 </script>
 
 {#if condition}
-	<svelte:component this={component} {...$$restProps} />
-{:else}
 	<slot />
+{:else}
+	<slot name="fallback" />
 {/if}
