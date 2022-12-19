@@ -9,7 +9,8 @@ const client = axios.create({
 	baseURL: PUBLIC_API_URL,
 	headers: {
 		'Content-Type': 'application/json'
-	}
+	},
+	validateStatus: (status) => status === 404 || (status >= 200 && status < 300)
 });
 
 export const initInterceptors = () => {

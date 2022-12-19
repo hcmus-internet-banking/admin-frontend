@@ -6,8 +6,7 @@
 		type EmployeeResponse,
 		type PutEmployee
 	} from '$lib/queries/employee';
-	import type { BaseResponse } from '$lib/store/auth/auth.store';
-	import client from '$lib/utils/client';
+	import { clearCache, fetchUrl, invalidateCache } from '$lib/store/load/load.store';
 	import {
 		Dialog,
 		DialogDescription,
@@ -69,15 +68,14 @@
 		}
 	];
 
-	async function fetchEmployees() {
-		return client.get<BaseResponse<EmployeeResponse>>(
-			`/api/employee?limit=${limit}&offset=${offset}`
-		);
+	function fetchEmployees() {
+		return fetchUrl<EmployeeResponse>(`/api/employee?limit=${limit}&offset=${offset}`, {
+			method: 'GET'
+		});
 	}
 
 	const updateEmployee = useUpdateEmployee();
 	const deleteEmployee = useDeleteEmployee();
-	let refetched = false;
 
 	const handleSaveClick = async () => {
 		const { data, employeeId } = editState || {};
@@ -102,7 +100,8 @@
 			// @ts-ignore
 			success: (data) => {
 				editState = null;
-				refetched = false;
+				invalidateCache(`/api/employee?limit=${limit}&offset=${offset}`);
+				refetched = true;
 				return `Edit user ${data.data.data.firstName} ${data.data.data.lastName} success!`;
 			},
 			//@ts-ignore
@@ -117,9 +116,13 @@
 
 	let employees = fetchEmployees();
 
-	$: if (refetched || offset >= 0) {
+	let refetched = false;
+	let data: EmployeeResponse;
+	$: if (offset >= 0 || refetched) {
 		employees = fetchEmployees();
 		refetched = false;
+
+		Promise.resolve($employees).then((result) => (data = result));
 	}
 </script>
 
@@ -152,7 +155,7 @@
 						loading: 'Deleting...',
 						// @ts-ignore
 						success: (data) => {
-							refetched = false;
+							clearCache();
 							return `Delete user ${data.data.data.firstName} ${data.data.data.lastName} success!`;
 						},
 						//@ts-ignore
@@ -169,9 +172,9 @@
 </Dialog>
 
 <section class="overflow-x-auto rounded-md border">
-	{#await employees}
+	{#if !data || refetched}
 		<Spinner />
-	{:then queryResult}
+	{:else}
 		<table class="md:table-fixed w-full whitespace-nowrap">
 			<thead>
 				<tr class="text-left text-sm font-semibold bg-gray-200 truncate">
@@ -181,7 +184,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each queryResult.data.data.data || [] as employee, i}
+				{#each data.data || [] as employee, i}
 					<tr
 						class={classNames('text-left', {
 							'bg-gray-200': i % 2 === 1
@@ -281,7 +284,7 @@
 											{employee[column.name]}
 										</div>
 										<svelte:fragment slot="fallback">
-											<input
+											<AppInput
 												disabled={$updateEmployee.isLoading}
 												on:change={(e) => {
 													if (editState)
@@ -307,7 +310,7 @@
 		</table>
 
 		<LightPaginationNav
-			totalItems={queryResult.data.data.metadata.total}
+			totalItems={data.metadata.total}
 			pageSize={limit}
 			currentPage={Math.ceil(offset / limit) + 1}
 			{limit}
@@ -317,5 +320,5 @@
 				editState = null;
 			}}
 		/>
-	{/await}
+	{/if}
 </section>

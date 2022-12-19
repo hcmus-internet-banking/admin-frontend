@@ -6,7 +6,6 @@ import { browser } from '$app/environment';
 import { queryClient } from '$lib/queries';
 import axios from 'axios';
 import { PUBLIC_API_URL } from '$env/static/public';
-import { toast } from 'svelte-french-toast';
 
 export type BaseResponse<T> = {
 	data: T;
@@ -80,9 +79,6 @@ const createAuth = () => {
 				user.set(data.data);
 
 				return data;
-			},
-			onError: async () => {
-				toast.error('Invalid email or password');
 			}
 		});
 	}

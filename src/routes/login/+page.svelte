@@ -7,6 +7,7 @@
 	import { onMount } from 'svelte';
 	import { authStore } from '$lib/store/auth/auth.store';
 	import { goto } from '$app/navigation';
+	import { AxiosError } from 'axios';
 
 	let email = '';
 	let password = '';
@@ -19,10 +20,22 @@
 	});
 
 	async function handleSubmit() {
-		const res = await authStore.login({ email, password });
+		try {
+			const res = await authStore.login({ email, password });
+			authStore.user.set(res?.data ?? null);
+			goto('/');
 
-		authStore.user.set(res?.data ?? null);
-		goto('/');
+			console.log('hi there');
+		} catch (err: any) {
+			if (err instanceof AxiosError) {
+				console.log(err);
+
+				toast.error(err.response?.data?.error?.message || "Can't login");
+				return;
+			}
+
+			toast.error(err?.message || "Can't login");
+		}
 	}
 </script>
 

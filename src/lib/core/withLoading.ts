@@ -22,6 +22,8 @@ export async function withLoading<T>({
 	} catch (err: any) {
 		if (error) error.set(err);
 		if (onError) onError(err);
+
+		throw err;
 	} finally {
 		loading.set(false);
 		if (onSettled) onSettled();
