@@ -6,6 +6,7 @@ import { browser } from '$app/environment';
 import { queryClient } from '$lib/queries';
 import axios from 'axios';
 import { PUBLIC_API_URL } from '$env/static/public';
+import { toast } from 'svelte-french-toast';
 
 export type BaseResponse<T> = {
 	data: T;
@@ -79,34 +80,33 @@ const createAuth = () => {
 				user.set(data.data);
 
 				return data;
+			},
+			onError: async () => {
+				toast.error('Invalid email or password');
 			}
 		});
 	}
 
 	async function logout() {
-		return await withLoading(
-			{
-				error,
-				loading,
-				fn: async () => {
-					const res = await axios.post(`${PUBLIC_API_URL}/api/employee/auth/logout`, {
-						refreshToken: get(user)?.tokens?.refreshToken
-					});
-					// navigate to home page svelte
-					goto('/');
+		return await withLoading({
+			error,
+			loading,
+			fn: async () => {
+				const res = await axios.post(`${PUBLIC_API_URL}/api/employee/auth/logout`, {
+					refreshToken: get(user)?.tokens?.refreshToken
+				});
+				// navigate to home page svelte
+				goto('/');
 
-					return res.data;
-				}
+				return res.data;
 			},
-			{
-				onSettled: () => {
-					// clear cache
-					queryClient.clear();
+			onSettled: () => {
+				// clear cache
+				queryClient.clear();
 
-					return user.set(null);
-				}
+				return user.set(null);
 			}
-		);
+		});
 	}
 
 	async function refreshAccessToken() {

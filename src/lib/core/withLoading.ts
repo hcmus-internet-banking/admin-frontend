@@ -1,20 +1,20 @@
 import type { Writable } from 'svelte/store';
 
-type WithLoadingOptions = {
-	onError?: (err: unknown) => void;
-	onSettled?: () => void;
-};
-
 type WithLoadingParams<T> = {
 	loading: Writable<boolean>;
 	error?: Writable<unknown>;
 	fn: () => Promise<T>;
+	onError?: (err: unknown) => void;
+	onSettled?: () => void;
 };
 
-export async function withLoading<T>(
-	{ error, fn, loading }: WithLoadingParams<T>,
-	{ onError, onSettled }: WithLoadingOptions = {}
-) {
+export async function withLoading<T>({
+	error,
+	fn,
+	loading,
+	onError,
+	onSettled
+}: WithLoadingParams<T>) {
 	loading.set(true);
 	try {
 		return await fn();

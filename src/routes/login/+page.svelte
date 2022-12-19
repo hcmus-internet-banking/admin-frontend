@@ -10,7 +10,8 @@
 
 	let email = '';
 	let password = '';
-	let loading = false;
+
+	$: loading = authStore.loading || false;
 
 	onMount(() => {
 		email = 'employee1@yopmail.com';
@@ -18,19 +19,10 @@
 	});
 
 	async function handleSubmit() {
-		try {
-			loading = true;
-			const res = await authStore.login({ email, password });
+		const res = await authStore.login({ email, password });
 
-			authStore.user.set(res?.data ?? null);
-			goto('/');
-		} catch (e: any) {
-			const errors = await tryParseTRPCError(e);
-
-			toast.error(errors.join('<br />'));
-		} finally {
-			loading = false;
-		}
+		authStore.user.set(res?.data ?? null);
+		goto('/');
 	}
 </script>
 
@@ -41,8 +33,8 @@
 			placeholder="Email"
 			clearable
 			autocomplete="email"
-			disabled={loading}
-			isLoading={loading}
+			disabled={$loading}
+			isLoading={$loading}
 		/>
 		<AppInput
 			type="password"
@@ -51,13 +43,13 @@
 			clearable
 			hiddenable
 			autocomplete="current-password"
-			isLoading={loading}
-			disabled={loading}
+			isLoading={$loading}
+			disabled={$loading}
 		/>
 		<!-- <div class="justify-center flex">
 			<div id="recaptcha_button" />
 		</div> -->
-		<AppButton type="submit" size="md" isLoading={loading} disabled={loading}>Login</AppButton>
+		<AppButton type="submit" size="md" isLoading={$loading} disabled={$loading}>Login</AppButton>
 	</form>
 </div>
 
