@@ -36,6 +36,7 @@
 			<div class="mx-auto max-w-5xl p-4">
 				<Header />
 				<slot />
+				<div class="mt-20" />
 				<Footer />
 			</div>
 		</div>

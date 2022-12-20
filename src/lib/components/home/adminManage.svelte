@@ -291,9 +291,9 @@
 		/>
 	{/if}
 
-	<AppButton
+	<!-- <AppButton
 		on:click={() => {
 			invalidateCache(['employees']);
 		}}>Invalidate</AppButton
-	>
+	> -->
 </section>

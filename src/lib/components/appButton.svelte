@@ -43,7 +43,7 @@
 
 <button
 	class={`flex items-center justify-center rounded-lg py-2 hover:bg-opacity-80 transition-[transform,box-shadow] hover:-translate-y-0.5 ${
-		!className?.includes('px-') ? 'px-4' : ''
+		!className?.includes('px-') ? 'px-10' : ''
 	} ${disabled ? 'cursor-not-allowed opacity-50' : ''} ${
 		presets[preset || 'filled'].classNames
 	} ${className} ${sizeClass[size || 'md']}`}
