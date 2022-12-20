@@ -11,6 +11,7 @@ specifiers:
   '@trpc/server': ^10.5.0
   '@types/bcryptjs': ^2.4.2
   '@types/jsonwebtoken': ^8.5.9
+  '@types/lodash': ^4.14.191
   '@typescript-eslint/eslint-plugin': ^5.45.0
   '@typescript-eslint/parser': ^5.45.0
   autoprefixer: ^10.4.7
@@ -22,6 +23,7 @@ specifiers:
   eslint-config-prettier: ^8.5.0
   eslint-plugin-svelte3: ^4.0.0
   jsonwebtoken: ^8.5.1
+  lodash: ^4.17.21
   moment: ^2.29.4
   postcss: ^8.4.14
   postcss-load-config: ^4.0.1
@@ -57,6 +59,7 @@ devDependencies:
   '@sveltestack/svelte-query': 1.6.0
   '@types/bcryptjs': 2.4.2
   '@types/jsonwebtoken': 8.5.9
+  '@types/lodash': 4.14.191
   '@typescript-eslint/eslint-plugin': 5.46.0_5mle7isnkfgjmrghnnczirv6iy
   '@typescript-eslint/parser': 5.46.0_ha6vam6werchizxrnqvarmz2zu
   autoprefixer: 10.4.13_postcss@8.4.19
@@ -68,6 +71,7 @@ devDependencies:
   eslint-config-prettier: 8.5.0_eslint@8.29.0
   eslint-plugin-svelte3: 4.0.0_2aagxyyd66x6iymg5nfckajqjq
   jsonwebtoken: 8.5.1
+  lodash: 4.17.21
   moment: 2.29.4
   postcss: 8.4.19
   postcss-load-config: 4.0.1_postcss@8.4.19
@@ -527,6 +531,10 @@ packages:
     resolution: {integrity: sha512-272FMnFGzAVMGtu9tkr29hRL6bZj4Zs1KZNeHLnKqAvp06tAIcarTMwOh8/8bz4FmKRcMxZhZNeUAQsNLoiPhg==}
     dependencies:
       '@types/node': 18.11.13
+    dev: true
+
+  /@types/lodash/4.14.191:
+    resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
     dev: true
 
   /@types/node/18.11.13:
@@ -1685,6 +1693,10 @@ packages:
 
   /lodash.once/4.1.1:
     resolution: {integrity: sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg==}
+    dev: true
+
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: true
 
   /loupe/2.3.6:

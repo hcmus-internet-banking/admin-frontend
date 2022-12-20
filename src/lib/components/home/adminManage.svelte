@@ -1,12 +1,15 @@
 <script lang="ts">
 	import {
 		putEmployeeSchema,
+		tableColumns,
 		useDeleteEmployee,
 		useUpdateEmployee,
 		type EmployeeResponse,
 		type PutEmployee
 	} from '$lib/queries/employee';
-	import { clearCache, fetchUrl, invalidateCache } from '$lib/store/load/load.store';
+	import { useSWR } from '$lib/store/load/load.store';
+	import { clearCache, invalidateCache } from '$lib/store/load/cache';
+	import client from '$lib/utils/client';
 	import {
 		Dialog,
 		DialogDescription,
@@ -18,7 +21,6 @@
 		ListboxOptions
 	} from '@rgossiaux/svelte-headlessui';
 	import classNames from 'classnames';
-	import type { SvelteComponentTyped } from 'svelte';
 	import toast from 'svelte-french-toast';
 	import { CreateOutline, SaveOutline, TrashOutline } from 'svelte-ionicons';
 	import { LightPaginationNav } from 'svelte-paginate';
@@ -37,43 +39,6 @@
 		employeeId: string | null;
 	} | null = null;
 
-	const columns: {
-		name: keyof PutEmployee | 'actions' | 'id';
-		label: string;
-		cell?: (props: { row: PutEmployee; rowIndex: number }) => SvelteComponentTyped;
-	}[] = [
-		{
-			name: 'id',
-			label: 'ID'
-		},
-		{
-			name: 'email',
-			label: 'Email'
-		},
-		{
-			name: 'firstName',
-			label: 'First Name'
-		},
-		{
-			name: 'lastName',
-			label: 'Last Name'
-		},
-		{
-			name: 'employeeType',
-			label: 'Employee Type'
-		},
-		{
-			name: 'actions',
-			label: 'Actions'
-		}
-	];
-
-	function fetchEmployees() {
-		return fetchUrl<EmployeeResponse>(`/api/employee?limit=${limit}&offset=${offset}`, {
-			method: 'GET'
-		});
-	}
-
 	const updateEmployee = useUpdateEmployee();
 	const deleteEmployee = useDeleteEmployee();
 
@@ -84,12 +49,10 @@
 			return;
 		}
 
-		try {
-			await putEmployeeSchema.parseAsync(data);
-		} catch (error) {
-			console.error(error);
+		await putEmployeeSchema.parseAsync(data).catch((e) => {
+			console.log(e);
 			return;
-		}
+		});
 
 		const response = $updateEmployee.mutateAsync({
 			id: employeeId,
@@ -100,8 +63,7 @@
 			// @ts-ignore
 			success: (data) => {
 				editState = null;
-				invalidateCache(`/api/employee?limit=${limit}&offset=${offset}`);
-				refetched = true;
+				refetch();
 				return `Edit user ${data.data.data.firstName} ${data.data.data.lastName} success!`;
 			},
 			//@ts-ignore
@@ -111,19 +73,22 @@
 		});
 	};
 
+	$: ({ data, error, isLoading, refetch } = useSWR<EmployeeResponse>(
+		['employees', { limit, offset }],
+		async () => {
+			return (
+				await client.get('/api/employee', {
+					params: {
+						limit,
+						offset
+					}
+				})
+			).data?.data;
+		}
+	));
+
 	let isDeleteDialogOpen = false;
 	let idToDelete: string | null = null;
-
-	let employees = fetchEmployees();
-
-	let refetched = false;
-	let data: EmployeeResponse;
-	$: if (offset >= 0 || refetched) {
-		employees = fetchEmployees();
-		refetched = false;
-
-		Promise.resolve($employees).then((result) => (data = result));
-	}
 </script>
 
 <Dialog
@@ -172,25 +137,29 @@
 </Dialog>
 
 <section class="overflow-x-auto rounded-md border">
-	{#if !data || refetched}
+	{#if $isLoading}
 		<Spinner />
+	{:else if $error}
+		<div class="p-4">
+			<p class="text-red-500">Error: {$error.message}</p>
+		</div>
 	{:else}
 		<table class="md:table-fixed w-full whitespace-nowrap">
 			<thead>
 				<tr class="text-left text-sm font-semibold bg-gray-200 truncate">
-					{#each columns as column}
+					{#each tableColumns as column}
 						<th class="p-4">{column.label}</th>
 					{/each}
 				</tr>
 			</thead>
 			<tbody>
-				{#each data.data || [] as employee, i}
+				{#each $data?.data || [] as employee, i}
 					<tr
 						class={classNames('text-left', {
 							'bg-gray-200': i % 2 === 1
 						})}
 					>
-						{#each columns as column}
+						{#each tableColumns as column}
 							{#if column.name === 'actions'}
 								<td class="flex space-x-1.5 h-14 items-center min-w-min">
 									{#if editState?.rowIndex === i}
@@ -310,7 +279,7 @@
 		</table>
 
 		<LightPaginationNav
-			totalItems={data.metadata.total}
+			totalItems={$data?.metadata.total}
 			pageSize={limit}
 			currentPage={Math.ceil(offset / limit) + 1}
 			{limit}
@@ -321,4 +290,10 @@
 			}}
 		/>
 	{/if}
+
+	<AppButton
+		on:click={() => {
+			invalidateCache(['employees']);
+		}}>Invalidate</AppButton
+	>
 </section>

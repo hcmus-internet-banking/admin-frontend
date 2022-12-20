@@ -1,43 +1,55 @@
-import client from '$lib/utils/client';
-import type { AxiosRequestConfig } from 'axios';
-import { writable } from 'svelte/store';
-import type { BaseResponse } from './../auth/auth.store';
+import { derived, writable } from 'svelte/store';
+import { cache } from './cache';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const cache = new Map<string, any>();
-
-export const invalidateCache = (url: string) => {
-	cache.delete(url);
-};
-export const clearCache = () => {
-	cache.clear();
-};
-
-export const fetchUrl = <T>(url: string, config: AxiosRequestConfig) => {
-	// eslint-disable-next-line @typescript-eslint/no-empty-function
-	const store = writable<Promise<T>>(new Promise(() => {}));
-
-	if (cache.has(url)) {
-		console.log(cache);
-
-		store.set(Promise.resolve(cache.get(url)));
-		return store;
-	}
+export const useSWR = <T>(key: any[], fetcher: () => Promise<T>) => {
+	const store = writable<T | null>();
+	const error = writable<Error | null>(null);
+	const isLoading = writable(false);
+	const data = derived(store, ($store) => {
+		return $store;
+	});
 
 	const load = async () => {
-		const res = await client<BaseResponse<T>>(url, config);
-
-		if (res.status === 200) {
-			console.log(res.status);
-			store.set(Promise.resolve(res.data.data));
-
-			if (res.config.url) cache.set(res.config.url, res.data.data);
-		} else {
-			store.set(Promise.reject(res.data));
+		if (cache.has(key)) {
+			store.set(cache.get(key));
+			isLoading.set(false);
+			error.set(null);
+			return;
 		}
+
+		isLoading.set(true);
+
+		fetcher()
+			.then((res) => {
+				error.set(null);
+				store.set(res);
+				cache.set(key, res);
+			})
+			.catch((err) => {
+				error.set(err);
+				store.set(null);
+			})
+			.finally(() => {
+				isLoading.set(false);
+			});
 	};
 
 	load();
 
-	return store;
+	return {
+		data,
+		isLoading: derived(isLoading, (isLoading) => isLoading),
+		error: derived(error, (error) => error),
+		refetch: async () => {
+			cache.invalidateCache(key);
+			load();
+		},
+		mutate: async (data: T) => {
+			cache.set(key, data);
+			store.set(data);
+			isLoading.set(false);
+			error.set(null);
+		}
+	};
 };

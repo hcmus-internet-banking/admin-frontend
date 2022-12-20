@@ -1,6 +1,6 @@
-import type { BaseResponse } from '$lib/store/auth/auth.store';
 import client from '$lib/utils/client';
-import { useMutation, useQuery } from '@sveltestack/svelte-query';
+import { useMutation } from '@sveltestack/svelte-query';
+import type { SvelteComponentTyped } from 'svelte';
 import { z } from 'zod';
 
 export interface EmployeeResponse {
@@ -49,17 +49,6 @@ export const useUpdateEmployee = () => {
 	);
 };
 
-export const useFetchAllEmployees = ({ limit, offset }: { limit: number; offset: number }) => {
-	return useQuery(
-		['employees', limit, offset],
-		() =>
-			client.get<BaseResponse<EmployeeResponse>>(`/api/employee?limit=${limit}&offset=${offset}`),
-		{
-			enabled: limit > 0 && offset >= 0
-		}
-	);
-};
-
 export const useDeleteEmployee = () => {
 	return useMutation((id: string) => client.delete(`/api/employee/${id}`), {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -68,3 +57,34 @@ export const useDeleteEmployee = () => {
 		}
 	});
 };
+
+export const tableColumns: {
+	name: keyof PutEmployee | 'actions' | 'id';
+	label: string;
+	cell?: (props: { row: PutEmployee; rowIndex: number }) => SvelteComponentTyped;
+}[] = [
+	{
+		name: 'id',
+		label: 'ID'
+	},
+	{
+		name: 'email',
+		label: 'Email'
+	},
+	{
+		name: 'firstName',
+		label: 'First Name'
+	},
+	{
+		name: 'lastName',
+		label: 'Last Name'
+	},
+	{
+		name: 'employeeType',
+		label: 'Employee Type'
+	},
+	{
+		name: 'actions',
+		label: 'Actions'
+	}
+];
