@@ -9,6 +9,7 @@
 	import { navigating } from '$app/stores';
 	import { QueryClient, QueryClientProvider } from '@sveltestack/svelte-query';
 	import Spinner from '$lib/components/spinner.svelte';
+	import AppButton from '$lib/components/appButton.svelte';
 
 	// First login and when logout => guard route
 	authStore.user.subscribe((user) => {
@@ -35,6 +36,7 @@
 		<div class="min-h-screen py-4 mb-52 bg-white">
 			<div class="mx-auto max-w-5xl p-4">
 				<Header />
+				<div class="h-4" />
 				<slot />
 				<div class="mt-20" />
 				<Footer />

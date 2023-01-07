@@ -11,7 +11,7 @@
 	<title>Admin Home - {PUBLIC_SITE_NAME}</title>
 </svelte:head>
 
-<div class="grid space-y-4">
+<div class="grid space-y-4 overflow-x-auto relative z-10">
 	<h1 class="text-sm">Welcome to SvelteKit</h1>
 
 	<TabGroup class="space-y-3">

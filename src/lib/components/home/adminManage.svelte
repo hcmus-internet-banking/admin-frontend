@@ -22,12 +22,13 @@
 	} from '@rgossiaux/svelte-headlessui';
 	import classNames from 'classnames';
 	import toast from 'svelte-french-toast';
-	import { CreateOutline, SaveOutline, TrashOutline } from 'svelte-ionicons';
+	import { CreateOutline, Eye, EyeOutline, SaveOutline, TrashOutline } from 'svelte-ionicons';
 	import { LightPaginationNav } from 'svelte-paginate';
 	import AppButton from '../appButton.svelte';
 	import AppInput from '../appInput.svelte';
 	import Spinner from '../spinner.svelte';
 	import WrapComponent from '../wrapComponent.svelte';
+	import { goto } from '$app/navigation';
 
 	let limit = 10;
 	let offset = 0;
@@ -144,6 +145,13 @@
 			<p class="text-red-500">Error: {$error.message}</p>
 		</div>
 	{:else}
+		<!-- Tips -->
+		<div class="p-4 bg-gray-100">
+			<p class="text-sm text-gray-500">
+				Click on email to view employee logs, click on edit to edit employee
+			</p>
+		</div>
+
 		<table class="md:table-fixed w-full whitespace-nowrap">
 			<thead>
 				<tr class="text-left text-sm font-semibold bg-gray-200 truncate">
@@ -195,6 +203,16 @@
 										<CreateOutline class="h-4" />
 									</AppButton>
 									<AppButton
+										preset="filled"
+										size="xs"
+										className="px-4"
+										on:click={() => {
+											goto(`/employees/${employee.id}`);
+										}}
+									>
+										<EyeOutline class="h-4" />
+									</AppButton>
+									<AppButton
 										preset="error"
 										size="xs"
 										className="px-4"
@@ -214,7 +232,8 @@
 								</td>
 							{:else if column.name === 'email'}
 								<td class="h-14 relative px-2 truncate">
-									<a href={`/employees/${employee[column.name]}`}>
+									<!-- Id -->
+									<a href={`/employees/${employee.id}`}>
 										{employee[column.name]}
 									</a>
 								</td>
