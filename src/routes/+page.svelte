@@ -2,6 +2,8 @@
 	import { PUBLIC_SITE_NAME } from '$env/static/public';
 	import AdminManage from '$lib/components/home/adminManage.svelte';
 	import Deposit from '$lib/components/home/deposit.svelte';
+	import RegisterNewCustomer from '$lib/components/home/registerNewCustomer.svelte';
+	import TabItem from '$lib/components/tabItem.svelte';
 	import { Tab, TabGroup, TabPanels, TabList, TabPanel } from '@rgossiaux/svelte-headlessui';
 </script>
 
@@ -15,18 +17,13 @@
 	<TabGroup class="space-y-3">
 		<TabList class="">
 			<Tab>
-				<h2
-					class="text-white font-mono px-6 py-2 bg-gradient-to-t from-pink-300 to-pink-400 rounded-md active:translate-y-1"
-				>
-					Employee management
-				</h2>
+				<TabItem>Employee management</TabItem>
 			</Tab>
 			<Tab>
-				<h2
-					class="text-white font-mono px-6 py-2 bg-gradient-to-t from-pink-300 to-pink-400 rounded-md active:translate-y-1"
-				>
-					Deposit
-				</h2>
+				<TabItem>Deposit</TabItem>
+			</Tab>
+			<Tab>
+				<TabItem>Register new customer</TabItem>
 			</Tab>
 		</TabList>
 		<TabPanels>
@@ -35,6 +32,9 @@
 			</TabPanel>
 			<TabPanel>
 				<Deposit />
+			</TabPanel>
+			<TabPanel>
+				<RegisterNewCustomer />
 			</TabPanel>
 		</TabPanels>
 	</TabGroup>
