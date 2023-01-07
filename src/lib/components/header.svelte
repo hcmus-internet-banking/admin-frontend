@@ -30,9 +30,3 @@
 		{/if}
 	{/if}
 </header>
-
-{#if isLoggedIn}
-	<div class="flex flex-col gap-2 mt-4">
-		<a href="/transactions">Explore transactions </a>
-	</div>
-{/if}

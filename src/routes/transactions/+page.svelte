@@ -36,26 +36,73 @@
 		firstName: string;
 	}
 
-	const offset = 0;
-	const limit = 10;
+	let offset = 0;
+	let limit = 10;
+	let start_time: Date | null = null;
+	let end_time: Date | null = null;
 
-	async function fetchTransactions({ offset, limit }: { offset: number; limit: number }) {
+	async function fetchTransactions({
+		offset,
+		limit,
+		start_time,
+		end_time
+	}: {
+		offset: number;
+		limit: number;
+		start_time: Date | null;
+		end_time: Date | null;
+	}) {
 		const response = await client.get<RootObject>('/api/employee/transactions', {
 			params: {
 				offset,
-				limit
+				limit,
+				start_time: start_time !== null ? start_time : start_time,
+				end_time: end_time !== null ? end_time : end_time
 			}
 		});
 
 		return response.data.data;
 	}
 
-	$: fetcher = fetchTransactions({ offset, limit });
+	$: fetcher = fetchTransactions({ offset, limit, end_time, start_time });
 
 	$: isLoggedIn = !!authStore.user;
 </script>
 
 {#if isLoggedIn}
+	<div class="grid md:grid-cols-2 gap-2">
+		<div class="grid">
+			<label for="start_time" class="ml-1">Start time </label>
+			<input
+				id="start_time"
+				type="date"
+				bind:value={start_time}
+				placeholder="Start time"
+				class="border p-2"
+			/>
+		</div>
+
+		<div class="grid">
+			<label for="end_time" class="ml-1">End time</label>
+			<input
+				id="end_time"
+				type="date"
+				bind:value={end_time}
+				placeholder="End time"
+				class="border p-2"
+			/>
+		</div>
+
+		<div class="grid">
+			<label for="start_time" class="ml-1">Bank </label>
+			<select class="border p-2">
+				<option value="all">All</option>
+				<option value="karma">KarmaBank</option>
+			</select>
+		</div>
+	</div>
+	<div class="h-4" />
+
 	{#await fetcher}
 		<div>loading...</div>
 	{:then transactions}
