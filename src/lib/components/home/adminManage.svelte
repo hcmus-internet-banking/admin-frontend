@@ -208,9 +208,15 @@
 								</td>
 							{:else if column.name === 'id'}
 								<td>
-									<div class="ml-4 truncate">
+									<a href={`/employees/${employee[column.name]}`}>
 										{employee[column.name]}
-									</div>
+									</a>
+								</td>
+							{:else if column.name === 'email'}
+								<td class="h-14 relative px-2 truncate">
+									<a href={`/employees/${employee[column.name]}`}>
+										{employee[column.name]}
+									</a>
 								</td>
 							{:else if column.name === 'employeeType'}
 								<td class="relative">

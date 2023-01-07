@@ -32,7 +32,7 @@
 	{#if !$isHydrated}
 		<Spinner />
 	{:else}
-		<div class="min-h-screen py-4">
+		<div class="min-h-screen py-4 mb-52 bg-white">
 			<div class="mx-auto max-w-5xl p-4">
 				<Header />
 				<slot />
