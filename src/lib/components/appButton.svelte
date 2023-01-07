@@ -1,4 +1,6 @@
 <script lang="ts">
+	import classNames from 'classnames';
+
 	const presets = {
 		filled: {
 			classNames: 'bg-gradient-to-tl from-blue-500 to-blue-400 hover:bg-opacity-80 text-white',
@@ -14,7 +16,8 @@
 		}
 	};
 
-	interface $$Props extends svelte.JSX.HTMLAttributes<HTMLElementTagNameMap['button']> {
+	interface $$Props
+		extends Omit<svelte.JSX.HTMLAttributes<HTMLElementTagNameMap['button']>, 'size'> {
 		className?: string;
 		disabled?: boolean;
 		isLoading?: boolean;
@@ -42,11 +45,12 @@
 </script>
 
 <button
-	class={`flex items-center justify-center rounded-lg py-2 hover:bg-opacity-80 transition-[transform,box-shadow] hover:-translate-y-0.5 ${
+	class={classNames(
+		`flex items-center justify-center rounded-lg py-2 hover:bg-opacity-80 transition-[transform,box-shadow] hover:-translate-y-0.5 ${
+			disabled ? 'cursor-not-allowed opacity-50' : ''
+		} ${presets[preset || 'filled'].classNames} ${className} ${sizeClass[size || 'md']}`,
 		!className?.includes('px-') ? 'px-10' : ''
-	} ${disabled ? 'cursor-not-allowed opacity-50' : ''} ${
-		presets[preset || 'filled'].classNames
-	} ${className} ${sizeClass[size || 'md']}`}
+	)}
 	disabled={disabled || isLoading}
 	on:click
 	{...$$restProps}

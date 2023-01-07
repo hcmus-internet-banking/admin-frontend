@@ -19,6 +19,8 @@ specifiers:
   axios: ^1.2.1
   bcrypt: ^5.1.0
   bcryptjs: ^2.4.3
+  bn.js: ^5.2.1
+  bn.js-typings: ^1.0.1
   classnames: ^2.3.2
   eslint: ^8.28.0
   eslint-config-prettier: ^8.5.0
@@ -50,6 +52,7 @@ specifiers:
 dependencies:
   '@trpc/client': 10.5.0_@trpc+server@10.5.0
   '@trpc/server': 10.5.0
+  bn.js: 5.2.1
   trpc-sveltekit: 3.1.1
 
 devDependencies:
@@ -69,6 +72,7 @@ devDependencies:
   axios: 1.2.1
   bcrypt: 5.1.0
   bcryptjs: 2.4.3
+  bn.js-typings: 1.0.1
   classnames: 2.3.2
   eslint: 8.29.0
   eslint-config-prettier: 8.5.0_eslint@8.29.0
@@ -563,6 +567,10 @@ packages:
     resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
     dev: true
 
+  /@types/node/10.17.60:
+    resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
+    dev: true
+
   /@types/node/18.11.13:
     resolution: {integrity: sha512-IASpMGVcWpUsx5xBOrxMj7Bl8lqfuTY7FKAnPmu5cHkfQVWF8GulWS1jbRqA934qZL35xh5xN/+Xe/i26Bod4w==}
     dev: true
@@ -873,6 +881,16 @@ packages:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}
     engines: {node: '>=8'}
     dev: true
+
+  /bn.js-typings/1.0.1:
+    resolution: {integrity: sha512-PdV3AEpI5A8mHCt3KgBobIJ+3rhoxxkRl8b0dCGDgGtJNYmN4KTPLHYq7xOSmKF1Kv06aZ5k8QhXbyG73IyhdQ==}
+    dependencies:
+      '@types/node': 10.17.60
+    dev: true
+
+  /bn.js/5.2.1:
+    resolution: {integrity: sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==}
+    dev: false
 
   /brace-expansion/1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}

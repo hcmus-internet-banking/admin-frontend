@@ -136,7 +136,7 @@
 	</div>
 </Dialog>
 
-<section class="overflow-x-auto rounded-md border">
+<section class="rounded-md border">
 	{#if $isLoading}
 		<Spinner />
 	{:else if $error}
@@ -165,6 +165,7 @@
 									{#if editState?.rowIndex === i}
 										<AppButton
 											preset="filled"
+											className="px-4"
 											size="xs"
 											on:click={handleSaveClick}
 											disabled={$updateEmployee.isLoading}
@@ -175,6 +176,7 @@
 									<AppButton
 										preset="outlined"
 										size="xs"
+										className="px-4"
 										on:click={() => {
 											if (editState?.rowIndex === i) {
 												editState = null;
@@ -195,6 +197,7 @@
 									<AppButton
 										preset="error"
 										size="xs"
+										className="px-4"
 										on:click={() => {
 											isDeleteDialogOpen = true;
 											idToDelete = employee.id;
@@ -216,29 +219,39 @@
 											{employee[column.name]}
 										</div>
 										<svelte:fragment slot="fallback">
-											<Listbox
-												value={editState?.data[column.name]}
-												on:change={(e) => {
-													//@ts-ignore
-													if (editState) editState.data[column.name] = e.detail;
-												}}
-											>
+											<Listbox>
 												<ListboxButton class="relative">
 													<AppInput
 														size="sm"
 														className="h-full"
 														containerClass="px-2"
-														disabled={$updateEmployee.isLoading}
-														value={editState?.data[column.name]}
+														disabled={true}
+														value={editState?.data.employeeType || ''}
 													/>
 												</ListboxButton>
 												<ListboxOptions
 													class="absolute w-full bg-white shadow-lg max-h-60 rounded-md overflow-auto z-10 top-10"
 												>
-													<ListboxOption value="ADMIN">
+													<ListboxOption
+														value="ADMIN"
+														on:click={() => {
+															//@ts-ignore
+															editState.data[column.name] = 'ADMIN';
+															//@ts-ignore
+															console.log(editState.data[column.name]);
+														}}
+													>
 														<div class="p-2 truncate">Admin</div>
 													</ListboxOption>
-													<ListboxOption value="EMPLOYEE">
+													<ListboxOption
+														value="EMPLOYEE"
+														on:click={() => {
+															//@ts-ignore
+															editState.data[column.name] = 'EMPLOYEE';
+															//@ts-ignore
+															console.log(editState.data[column.name]);
+														}}
+													>
 														<div class="p-2 truncate">Employee</div>
 													</ListboxOption>
 												</ListboxOptions>

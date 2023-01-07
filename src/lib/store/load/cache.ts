@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash';
+import lodash from 'lodash';
 
 /**
  * @description
@@ -41,7 +41,7 @@ class CustomCache extends Cache {
 			}
 
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			if (a.every((item: any, index: string | number) => isEqual(item, b[index]))) {
+			if (a.every((item: any, index: string | number) => lodash.isEqual(item, b[index]))) {
 				cache.delete(key);
 				console.log('Invalidated cache', key);
 			}

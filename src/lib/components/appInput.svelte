@@ -1,7 +1,8 @@
 <script lang="ts">
 	import classNames from 'classnames';
 
-	interface $$Props extends svelte.JSX.HTMLAttributes<HTMLElementTagNameMap['input']> {
+	interface $$Props
+		extends Omit<svelte.JSX.HTMLAttributes<HTMLElementTagNameMap['input']>, 'size'> {
 		value?: string;
 		placeholder?: string;
 		className?: string;

@@ -64,10 +64,6 @@ export const tableColumns: {
 	cell?: (props: { row: PutEmployee; rowIndex: number }) => SvelteComponentTyped;
 }[] = [
 	{
-		name: 'id',
-		label: 'ID'
-	},
-	{
 		name: 'email',
 		label: 'Email'
 	},
