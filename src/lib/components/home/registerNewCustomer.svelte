@@ -33,20 +33,18 @@
 	const { form, errors, data } = createForm<z.infer<typeof registerSchema>>({
 		onSubmit: async (values, { reset }) => {
 			try {
-				console.log(values);
-
 				toast.promise(
 					client.post('/api/auth/register', {
 						...values
 					}),
 					{
-						loading: 'Depositing...',
+						loading: 'Registering...',
 						//@ts-ignore
 						success: () => {
 							showModal = true;
 							reset();
 
-							return 'Deposit successful';
+							return 'Register successful';
 						},
 						//@ts-ignore
 						error: (e) => {
@@ -122,9 +120,6 @@
 
 			<div class="border-dashed p-2">
 				<p class="text-sm">You can now login with your new account</p>
-
-				<p>Email: {$data.email}</p>
-				<p>Password: {$data.password}</p>
 			</div>
 
 			<div class="flex-1" />

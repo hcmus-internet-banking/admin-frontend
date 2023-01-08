@@ -152,7 +152,7 @@
 			</p>
 		</div>
 
-		<table class="md:table-fixed w-full whitespace-nowrap">
+		<table class="w-full whitespace-nowrap">
 			<thead>
 				<tr class="text-left text-sm font-semibold bg-gray-200 truncate">
 					{#each tableColumns as column}

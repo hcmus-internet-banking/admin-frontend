@@ -53,7 +53,9 @@
 					{log.createdAt}:{'\t'}
 				</div>
 				<div class="font-mono">
-					{log.type}<br />
+					<b>
+						{log.type}<br />
+					</b>
 					{log.data}
 				</div>
 			</div>
