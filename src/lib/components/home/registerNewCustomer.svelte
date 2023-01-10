@@ -40,11 +40,11 @@
 					{
 						loading: 'Registering...',
 						//@ts-ignore
-						success: () => {
+						success: (data) => {
 							showModal = true;
 							reset();
 
-							return 'Register successful';
+							return `Account: ${data.data.data.email} created`;
 						},
 						//@ts-ignore
 						error: (e) => {
@@ -116,7 +116,9 @@
 		<div class="w-96 h-96 bg-white rounded-md shadow-md mx-auto translate-y-1/2 p-4 flex flex-col">
 			<h1 class="text-2xl">Register success</h1>
 
-			<Checkmark class="w-12 h-12 text-green-500" />
+			<div class="mx-auto w-full">
+				<Checkmark class="w-24 h-24 text-green-500" />
+			</div>
 
 			<div class="border-dashed p-2">
 				<p class="text-sm">You can now login with your new account</p>

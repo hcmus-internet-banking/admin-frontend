@@ -23,7 +23,7 @@
 	import client from '$lib/utils/client';
 	import toast from 'svelte-french-toast';
 
-	const { form, errors } = createForm<z.infer<typeof validationSchema>>({
+	const { form, errors, reset } = createForm<z.infer<typeof validationSchema>>({
 		onSubmit: async (values) => {
 			try {
 				console.log(values);
@@ -34,7 +34,14 @@
 					}),
 					{
 						loading: 'Depositing...',
-						success: 'Deposit successful',
+						//@ts-ignore
+						success: (data) => {
+							reset();
+
+							console.log(data.data.data);
+
+							return data.data.data.data;
+						},
 						//@ts-ignore
 						error: (e) => {
 							console.log(e);
