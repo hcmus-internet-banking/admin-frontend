@@ -22,11 +22,40 @@
 	interface Datum {
 		amount: string;
 		createdAt: string;
-		fromCustomer: FromCustomer;
+		fromCustomer?: FromCustomer;
 		toCustomer: FromCustomer;
+		fromRecipient?: FromRecipient;
 		message: string;
 		id: string;
 		type: string;
+	}
+
+	interface FromRecipient {
+		id: string;
+		accountNumber: string;
+		mnemonicName?: any;
+		internalBankCustomerId?: any;
+		customerRecipient: any[];
+		fromTransaction: FromTransaction[];
+		internalBankCustomer?: any;
+		toTransaction: any[];
+		transactions: any[];
+	}
+
+	interface FromTransaction {
+		id: string;
+		amount: string;
+		message: string;
+		createdAt: string;
+		updatedAt: string;
+		deletedAt?: any;
+		type: string;
+		fromCustomerId?: any;
+		toCustomerId: string;
+		fromRecipientId: string;
+		toRecipientId?: any;
+		recipientId?: any;
+		extBankId?: any;
 	}
 
 	interface FromCustomer {
@@ -56,8 +85,8 @@
 			params: {
 				offset,
 				limit,
-				start_time: start_time !== null ? start_time : start_time,
-				end_time: end_time !== null ? end_time : end_time
+				startDate: start_time !== null ? start_time : start_time,
+				endDate: end_time !== null ? end_time : end_time
 			}
 		});
 
@@ -109,14 +138,21 @@
 		<div class="divide-y">
 			{#each transactions.data as transaction}
 				<div class="p-2">
-					<div class="font-mono">
-						+{Intl.NumberFormat('en-US').format(Number(transaction.amount))} from {transaction
-							.fromCustomer.firstName}
-						{transaction.fromCustomer.lastName}
-					</div>
+					{#if !!transaction.fromCustomer?.firstName && !!transaction.fromCustomer?.lastName}
+						<div class="font-mono">
+							+{Intl.NumberFormat('en-US').format(Number(transaction.amount))} from {transaction
+								.fromCustomer?.firstName}
+							{transaction.fromCustomer?.lastName}
+						</div>
+					{/if}
 
 					<div class="text-sm">
 						<div>
+							<b> From account number: </b>{transaction.fromRecipient?.accountNumber}
+						</div>
+						<div><b>To account number:</b> {transaction.toCustomer.accountNumber}</div>
+						<div>
+							<b>Message:</b>
 							{transaction.message}
 						</div>
 						#{transaction.id}
