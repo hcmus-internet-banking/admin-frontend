@@ -138,19 +138,31 @@
 		<div class="divide-y">
 			{#each transactions.data as transaction}
 				<div class="p-2">
-					{#if !!transaction.fromCustomer?.firstName && !!transaction.fromCustomer?.lastName}
-						<div class="font-mono">
-							+{Intl.NumberFormat('en-US').format(Number(transaction.amount))} from {transaction
-								.fromCustomer?.firstName}
+					<div class="font-mono">
+						+{Intl.NumberFormat('en-US').format(Number(transaction.amount))}
+
+						<!-- {#if !!transaction.fromCustomer?.firstName && !!transaction.fromCustomer?.lastName}
+							from {transaction.fromCustomer?.firstName}
 							{transaction.fromCustomer?.lastName}
-						</div>
-					{/if}
+						{/if} -->
+					</div>
 
 					<div class="text-sm">
-						<div>
-							<b> From account number: </b>{transaction.fromRecipient?.accountNumber}
-						</div>
+						{#if transaction.fromCustomer?.accountNumber}
+							<div>
+								<b> From account number: </b>{transaction.fromCustomer?.accountNumber}
+							</div>
+						{/if}
+						{#if transaction.fromRecipient?.accountNumber}
+							<div>
+								<b> From account number: </b>{transaction.fromRecipient?.accountNumber}
+							</div>
+						{/if}
 						<div><b>To account number:</b> {transaction.toCustomer.accountNumber}</div>
+						<div>
+							<b>Date:</b>
+							{Intl.DateTimeFormat('vi-VN').format(new Date(transaction.createdAt))}
+						</div>
 						<div>
 							<b>Message:</b>
 							{transaction.message}
